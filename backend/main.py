@@ -169,22 +169,66 @@ async def simulate_incident(
     db: Session = Depends(get_db),
 ):
     """
-    Seed mock data and trigger a billing-service latency incident.
+    Seed realistic mock data and trigger a billing-service latency incident.
+    Seeds multiple logs (errors, a timeout, a warning) and two deployments
+    so the AI agents have rich signal to investigate.
     Useful for demos and local testing.
     """
-    log1    = models.Log(
-        service="billing-service",
-        level="ERROR",
-        message="Database Connection Pool Exhaustion",
-        timestamp=datetime.now(timezone.utc),
-    )
-    deploy1 = models.Deployment(
-        service="billing-service",
-        version="v2.14.0",
-        timestamp=datetime.now(timezone.utc),
-        commit_hash="8f92a1c",
-    )
-    db.add_all([log1, deploy1])
+    from datetime import timedelta
+
+    now = datetime.now(timezone.utc)
+
+    # ── Logs: 3x repeated pool exhaustion, 1x timeout, 1x warning ──────────
+    logs = [
+        models.Log(
+            service="billing-service",
+            level="ERROR",
+            message="Database Connection Pool Exhaustion",
+            timestamp=now - timedelta(minutes=12),
+        ),
+        models.Log(
+            service="billing-service",
+            level="ERROR",
+            message="Database Connection Pool Exhaustion",
+            timestamp=now - timedelta(minutes=9),
+        ),
+        models.Log(
+            service="billing-service",
+            level="ERROR",
+            message="Database Connection Pool Exhaustion",
+            timestamp=now - timedelta(minutes=6),
+        ),
+        models.Log(
+            service="billing-service",
+            level="ERROR",
+            message="Request timeout after 30s: downstream call to payment-gateway exceeded threshold",
+            timestamp=now - timedelta(minutes=5),
+        ),
+        models.Log(
+            service="billing-service",
+            level="WARNING",
+            message="Connection pool utilisation at 89% — approaching hard limit of 100 connections",
+            timestamp=now - timedelta(minutes=14),
+        ),
+    ]
+
+    # ── Deployments: stable baseline + bad v2.14.0 deployed 20 min ago ─────
+    deploys = [
+        models.Deployment(
+            service="billing-service",
+            version="v2.13.9",
+            timestamp=now - timedelta(hours=48),
+            commit_hash="a3c1f7d",
+        ),
+        models.Deployment(
+            service="billing-service",
+            version="v2.14.0",
+            timestamp=now - timedelta(minutes=20),
+            commit_hash="8f92a1c",
+        ),
+    ]
+
+    db.add_all(logs + deploys)
     db.commit()
 
     payload = AlertPayload(
