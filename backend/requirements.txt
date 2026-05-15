@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+langgraph
+langchain-core>=0.2.2
+langchain-google-genai
+langchain-openai
+langchain-groq
+typing_extensions
+httpx
+python-dotenv

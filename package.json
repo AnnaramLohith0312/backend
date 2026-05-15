@@ -1,0 +1,8 @@
+{
+  "name": "sentinelops-ai",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
