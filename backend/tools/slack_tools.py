@@ -56,3 +56,38 @@ def send_incident_alert(incident_id: str, service: str, severity: str, action: s
         f">*Recommended Action*: _{action}_"
     )
     send_slack_message(text)
+
+
+# ── Formatting helpers (no network calls) ─────────────────────────────────
+
+def format_incident_message(
+    incident_id: str,
+    service: str,
+    severity: str,
+    root_cause: str,
+    action: str,
+    confidence: float = 0.0,
+    status: str = "resolved",
+) -> str:
+    """
+    Return a demo-friendly, Slack-formatted incident summary string.
+
+    This is a pure formatting helper — no network calls are made.
+    The reporter agent can call this to preview the notification text
+    before (optionally) dispatching it via send_slack_message().
+
+    Example output:
+        🚨 *SentinelOps | billing-service* — HIGH
+        > *Incident*: `abc-123`  |  *Status*: `resolved`
+        > *Root Cause*: Recent deployment change
+        > *Action*: Rollback to previous stable deployment  (confidence 85%)
+    """
+    emoji = "🚨" if severity.lower() in ("high", "critical") else "⚠️"
+    conf_pct = f"{confidence:.0%}" if confidence else "N/A"
+
+    return (
+        f"{emoji} *SentinelOps | {service}* — {severity.upper()}\n"
+        f">*Incident*: `{incident_id}`  |  *Status*: `{status}`\n"
+        f">*Root Cause*: {root_cause}\n"
+        f">*Action*: {action}  (confidence {conf_pct})"
+    )
