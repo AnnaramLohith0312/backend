@@ -58,7 +58,7 @@ def send_incident_alert(incident_id: str, service: str, severity: str, action: s
     send_slack_message(text)
 
 
-# ── Formatting helpers (no network calls) ─────────────────────────────────
+# ── Formatting helper (no network calls) ─────────────────────────────────
 
 def format_incident_message(
     incident_id: str,
@@ -67,27 +67,25 @@ def format_incident_message(
     root_cause: str,
     action: str,
     confidence: float = 0.0,
-    status: str = "resolved",
 ) -> str:
     """
     Return a demo-friendly, Slack-formatted incident summary string.
 
-    This is a pure formatting helper — no network calls are made.
-    The reporter agent can call this to preview the notification text
-    before (optionally) dispatching it via send_slack_message().
+    This is a pure formatting helper — no HTTP calls are made.
+    Pass the result to send_slack_message() when a real webhook is configured.
 
     Example output:
-        🚨 *SentinelOps | billing-service* — HIGH
-        > *Incident*: `abc-123`  |  *Status*: `resolved`
+        :rotating_light: *SentinelOps Incident Resolved* — `billing-service`
+        > *Incident ID*: `abc-123`
+        > *Severity*: `HIGH`
         > *Root Cause*: Recent deployment change
         > *Action*: Rollback to previous stable deployment  (confidence 85%)
     """
-    emoji = "🚨" if severity.lower() in ("high", "critical") else "⚠️"
-    conf_pct = f"{confidence:.0%}" if confidence else "N/A"
-
+    emoji = ":rotating_light:" if severity in ("high", "critical") else ":warning:"
     return (
-        f"{emoji} *SentinelOps | {service}* — {severity.upper()}\n"
-        f">*Incident*: `{incident_id}`  |  *Status*: `{status}`\n"
+        f"{emoji} *SentinelOps Incident Resolved* — `{service}`\n"
+        f">*Incident ID*: `{incident_id}`\n"
+        f">*Severity*: `{severity.upper()}`\n"
         f">*Root Cause*: {root_cause}\n"
-        f">*Action*: {action}  (confidence {conf_pct})"
+        f">*Action*: {action}  (confidence {confidence:.0%})"
     )
