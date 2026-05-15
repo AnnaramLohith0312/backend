@@ -246,9 +246,7 @@ def reporter_agent(state: AgentState) -> AgentState:
         error_msg = f"ReporterAgent error: {e}"
         print(f"[ReporterAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias

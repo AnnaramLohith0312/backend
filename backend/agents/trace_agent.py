@@ -60,12 +60,10 @@ def trace_agent(state: AgentState) -> AgentState:
             error_msg = f"TraceAgent error: {exc}"
             print(f"[TraceAgent] {error_msg}")
             update_incident_status(incident_id, "failed")
-            errors = list(state.get("errors") or [])
-            errors.append(error_msg)
             return {
                 "trace_spans": [],
                 "trace_summary": "Trace fetch failed.",
-                "errors": errors
+                "errors": [error_msg],
             }
 
         dependency_chain = _build_dependency_chain(service, spans)
@@ -92,9 +90,7 @@ def trace_agent(state: AgentState) -> AgentState:
         error_msg = f"TraceAgent unhandled error: {e}"
         print(f"[TraceAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias so graph.py keeps working unchanged

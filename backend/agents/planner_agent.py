@@ -178,9 +178,7 @@ def planner_agent(state: AgentState) -> AgentState:
         error_msg = f"PlannerAgent error: {e}"
         print(f"[PlannerAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias

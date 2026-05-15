@@ -31,12 +31,10 @@ def memory_agent(state: AgentState) -> AgentState:
             error_msg = f"MemoryAgent error: {exc}"
             print(f"[MemoryAgent] {error_msg}")
             update_incident_status(incident_id, "failed")
-            errors = list(state.get("errors") or [])
-            errors.append(error_msg)
             return {
                 "historical_matches": [],
                 "memory_context": "",
-                "errors": errors,
+                "errors": [error_msg],
             }
 
         matches: list[dict[str, Any]] = []
@@ -71,9 +69,7 @@ def memory_agent(state: AgentState) -> AgentState:
         error_msg = f"MemoryAgent unhandled error: {e}"
         print(f"[MemoryAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias so graph.py keeps working unchanged

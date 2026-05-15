@@ -35,12 +35,10 @@ def log_agent(state: AgentState) -> AgentState:
             error_msg = f"LogAgent error: {exc}"
             print(f"[LogAgent] {error_msg}")
             update_incident_status(incident_id, "failed")
-            errors = list(state.get("errors") or [])
-            errors.append(error_msg)
             return {
                 "raw_logs": [],
                 "logs_summary": "Log fetch failed.",
-                "errors": errors
+                "errors": [error_msg],
             }
 
         log_count = len(raw_logs)
@@ -81,9 +79,7 @@ def log_agent(state: AgentState) -> AgentState:
         error_msg = f"LogAgent unhandled error: {e}"
         print(f"[LogAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 # Alias so graph.py keeps working unchanged
 log_agent_node = log_agent

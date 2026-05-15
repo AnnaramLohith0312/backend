@@ -216,9 +216,7 @@ def correlation_agent(state: AgentState) -> AgentState:
         error_msg = f"CorrelationAgent error: {e}"
         print(f"[CorrelationAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias so graph.py keeps working unchanged

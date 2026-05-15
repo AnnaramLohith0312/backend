@@ -32,12 +32,10 @@ def deploy_agent(state: AgentState) -> AgentState:
             error_msg = f"DeployAgent error: {exc}"
             print(f"[DeployAgent] {error_msg}")
             update_incident_status(incident_id, "failed")
-            errors = list(state.get("errors") or [])
-            errors.append(error_msg)
             return {
                 "recent_deployments": [],
                 "deployment_summary": "Deployment fetch failed.",
-                "errors": errors,
+                "errors": [error_msg],
             }
 
         recent_count = len(deployments)
@@ -77,9 +75,7 @@ def deploy_agent(state: AgentState) -> AgentState:
         error_msg = f"DeployAgent unhandled error: {e}"
         print(f"[DeployAgent] {error_msg}")
         update_incident_status(incident_id, "failed")
-        errors = list(state.get("errors") or [])
-        errors.append(error_msg)
-        return {"errors": errors}
+        return {"errors": [error_msg]}
 
 
 # Alias for compatibility with existing graph.py
